@@ -30,20 +30,40 @@ class FTPServer {
 
 				Socket dataSocket = new Socket(connectionSocket.getInetAddress(), port);
 				DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
-                      ..........................
+				//TODO Fill in the rest of this
 
-
+				dataSocket.close();
+				System.out.println("Data Socket closed");
 			}
 
-			dataSocket.close();
-			System.out.println("Data Socket closed");
-		}
-        
-			......................
+			//this might be in wrong place in code, dunno
+			if (clientCommand.equals("retr:")){
+				Socket dataSocket = new Socket(connectionSocket.getInetAddress(), port);
+				DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
 
-		if (clientCommand.equals("retr:")) {
-                ..............................
-		..............................
+				//TODO Fill in the rest of this and get file from this
+
+				dataSocket.close();
+				System.out.println("Data Socket closed");
+			}
+
+			if (clientCommand.equals("stor:")){
+				Socket dataSocket = new Socket(connectionSocket.getInetAddress(), port);
+				DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
+
+				//TODO Fill in the rest of this and get file from this
+
+				dataSocket.close();
+				System.out.println("Data Socket closed");
+			}
+
+			//
+			if (clientCommand.equals("close")){
+				connectionSocket.close();
+				break;
+			}
+
 		}
+
 	}
 }
