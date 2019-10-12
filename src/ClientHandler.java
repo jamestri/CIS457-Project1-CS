@@ -45,12 +45,12 @@ public class ClientHandler extends Thread{
             }
             dataOutToClient.writeBytes("\n");
 
-
+            dataOutToClient.close();
             dataSocket.close();
             System.out.println("Data Socket closed");
         }
 
-        //this might be in wrong place in code, dunno
+
         if (clientCommand.startsWith("retr:")){
             Socket dataSocket = new Socket(socket.getInetAddress(), port);
             DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
@@ -60,7 +60,7 @@ public class ClientHandler extends Thread{
             File folder = new File("PATH");
             String[] files = folder.list();
 
-            File sendFile;
+            //finding our file in directory and sending it
             for (String file: files){
                 if (file.equals(fileName)){
                     FileInputStream fis = new FileInputStream(fileName);
@@ -70,7 +70,7 @@ public class ClientHandler extends Thread{
                     dataOutToClient.writeBytes("550");
                 }
             }
-
+            dataOutToClient.close();
             dataSocket.close();
             System.out.println("Data Socket closed");
         }
@@ -79,8 +79,11 @@ public class ClientHandler extends Thread{
             Socket dataSocket = new Socket(socket.getInetAddress(), port);
             DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
 
-            //TODO Fill in the rest of this and get file from this
+            String fileName = clientCommand.substring(6);
 
+            //TODO get bytes, and turn into file somehow
+
+            dataOutToClient.close();
             dataSocket.close();
             System.out.println("Data Socket closed");
         }
@@ -93,6 +96,8 @@ public class ClientHandler extends Thread{
 
     }
 
+
+    //might need bigger buffer depending on file
     private static void sendBytes(FileInputStream fis, OutputStream os) throws Exception{
         byte[] buffer = new byte[1024];
         int bytes = 0;

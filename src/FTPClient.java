@@ -44,7 +44,7 @@ class FTPClient {
                 if (sentence.equals("list:")) {
 
                     port = port + 2;
-                    outToServer.writeBytes(port + " " + sentence + " " + '\n');
+                    outToServer.writeBytes(sentence + '\n');
 
                     ServerSocket welcomeData = new ServerSocket(port);
                     Socket dataSocket = welcomeData.accept();
@@ -52,8 +52,7 @@ class FTPClient {
                     DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
                     while (notEnd) {
                         modifiedSentence = inData.readUTF();
-               ........................................
-	       ........................................
+                        //do something
                     }
 
 
@@ -62,4 +61,9 @@ class FTPClient {
                     System.out.println("\nWhat would you like to do next: \n retr: file.txt ||stor: file.txt  || close");
 
                 } else if (sentence.startsWith("retr: ")) {
-		....................................................
+                    //do something
+                }
+            }
+        }
+    }
+}
