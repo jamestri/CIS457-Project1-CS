@@ -8,6 +8,7 @@ class FTPServer {
 		while (true) {
 			Socket connectionSocket = welcomeSocket.accept();
 			ClientHandler handler = new ClientHandler(connectionSocket);
+			handler.run();
 		}
 
 	}

@@ -28,6 +28,7 @@ class FTPClient {
             String serverName = tokens.nextToken(); // pass the connect command
             serverName = tokens.nextToken();
             port1 = Integer.parseInt(tokens.nextToken());
+            System.out.println(port1);
             System.out.println("You are connected to " + serverName);
 
             Socket ControlSocket = new Socket(serverName, port1);
@@ -44,20 +45,19 @@ class FTPClient {
 
                 if (sentence.equals("list:")) {
 
+
                     port = port + 2;
+                    outToServer.writeBytes(port + " " + sentence + '\n');
+
                     ServerSocket welcomeData = new ServerSocket(port);
                     Socket dataSocket = welcomeData.accept();
-                    DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
-
-                    outToServer.writeBytes(sentence + " " + port + '\n');
-
-                    while (notEnd) {
-                        modifiedSentence = inData.readUTF();
+                    BufferedReader inData = new BufferedReader(new InputStreamReader(dataSocket.getInputStream()));
+                    //System.out.println(inData.available());
+                    while (inData.read() != -1) {
+                        modifiedSentence = inData.readLine();
                         System.out.println(modifiedSentence);
-                        if (modifiedSentence.equals(-1)){
-                            notEnd = false;
-                        }
                     }
+
 
                     welcomeData.close();
                     dataSocket.close();
@@ -72,7 +72,7 @@ class FTPClient {
                     Socket dataSocket = welcomeData.accept();
                     DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
 
-                    outToServer.writeBytes(sentence + " " + port + '\n');
+                    outToServer.writeBytes(port + "\n" + sentence + '\n');
 
                     if (inData.readUTF().equals("550")){
                         System.out.println("Cannot find file");
@@ -98,7 +98,7 @@ class FTPClient {
 
                     DataOutputStream dataToServer = new DataOutputStream(dataSocket.getOutputStream());
 
-                    outToServer.writeBytes(sentence + " " + port + '\n');
+                    outToServer.writeBytes(port + "\n" + sentence + '\n');
 
                     //PATH should be directory of client
                     File folder = new File("C:\\Users\\bunny\\IdeaProjects\\CIS457Proj1");
@@ -121,15 +121,16 @@ class FTPClient {
                 } if (sentence.startsWith("close")){
 
                     port += 2;
-                    outToServer.writeBytes(sentence + " " + port + '\n');
+                    outToServer.writeBytes(port + "\n" + sentence + '\n');
                     ControlSocket.close();
                     System.out.println("Connection closed");
                     return;
                 }
+                //inFromUser.close();
             }
         }
 
-        inFromUser.close();
+
     }
 
     //might need bigger buffer

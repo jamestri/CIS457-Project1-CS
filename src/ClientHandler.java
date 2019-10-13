@@ -8,7 +8,6 @@ public class ClientHandler extends Thread{
 
     public ClientHandler(Socket connection) throws Exception{
         this.socket = connection;
-        System.out.println("Client connected");
     }
 
 
@@ -26,9 +25,8 @@ public class ClientHandler extends Thread{
         DataOutputStream outToClient = new DataOutputStream(socket.getOutputStream());
         BufferedReader inFromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-
+        System.out.println("Client connected");
         String fromClient = inFromClient.readLine();
-
 
         //may need to change where it get the port number
         StringTokenizer tokens = new StringTokenizer(fromClient);
