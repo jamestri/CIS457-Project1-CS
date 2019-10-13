@@ -19,6 +19,6 @@ class FTPServer {
 			Socket connectionSocket = welcomeSocket.accept();
 			ClientHandler handler = new ClientHandler(connectionSocket);
 		}
-		
+
 	}
 }

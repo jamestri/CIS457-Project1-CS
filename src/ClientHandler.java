@@ -7,7 +7,7 @@ public class ClientHandler extends Thread{
     Socket socket;
 
     public ClientHandler(Socket connection) throws Exception{
-        this.socket = socket;
+        this.socket = connection;
     }
 
 
@@ -101,6 +101,7 @@ public class ClientHandler extends Thread{
 
         if (clientCommand.equals("close")){
             socket.close();
+            System.out.println("Client has disconnected");
             return;
         }
 
