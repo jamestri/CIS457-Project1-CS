@@ -17,6 +17,7 @@ class FTPClient {
         boolean clientgo = true;
         int port1;
 
+        System.out.println("Enter connect to connect to server");
 
         BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
         sentence = inFromUser.readLine();
@@ -73,8 +74,17 @@ class FTPClient {
 
                     outToServer.writeBytes(sentence + " " + port + '\n');
 
-
-                    //TODO check for if file is found, then retrieve, if not fail
+                    if (inData.readUTF().equals("550")){
+                        System.out.println("Cannot find file");
+                    } else {
+                        File file = new File(fileName);
+                        OutputStream out = new FileOutputStream(file);
+                        byte[] bytes = inData.readAllBytes();
+                        out.write(bytes);
+                        out.close();
+                    }
+                    welcomeData.close();
+                    dataSocket.close();
 
                     System.out.println("\nWhat would you like to do next: \n retr: file.txt ||stor: file.txt  || close");
 
@@ -91,7 +101,7 @@ class FTPClient {
                     outToServer.writeBytes(sentence + " " + port + '\n');
 
                     //PATH should be directory of client
-                    File folder = new File("PATH");
+                    File folder = new File("C:\\Users\\bunny\\IdeaProjects\\CIS457Proj1");
                     String[] files = folder.list();
                     //needs some refining
                     //finding our file in directory and sending it

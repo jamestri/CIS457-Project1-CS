@@ -8,6 +8,7 @@ public class ClientHandler extends Thread{
 
     public ClientHandler(Socket connection) throws Exception{
         this.socket = connection;
+        System.out.println("Client connected");
     }
 
 
@@ -25,6 +26,7 @@ public class ClientHandler extends Thread{
         DataOutputStream outToClient = new DataOutputStream(socket.getOutputStream());
         BufferedReader inFromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
+
         String fromClient = inFromClient.readLine();
 
 
@@ -39,7 +41,7 @@ public class ClientHandler extends Thread{
             DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
 
             //For when we need to use on a machine, set PATH to directory of server
-            File folder = new File("PATH");
+            File folder = new File("C:\\Users\\bunny\\IdeaProjects\\CIS457Proj1");
             String[] files = folder.list();
 
             for (String file : files){
@@ -60,7 +62,7 @@ public class ClientHandler extends Thread{
 
             String fileName = clientCommand.substring(6);//starting after the space
 
-            File folder = new File("PATH");
+            File folder = new File("C:\\Users\\bunny\\IdeaProjects\\CIS457Proj1");
             String[] files = folder.list();
 
             //finding our file in directory and sending it
