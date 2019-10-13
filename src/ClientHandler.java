@@ -27,6 +27,8 @@ public class ClientHandler extends Thread{
 
         String fromClient = inFromClient.readLine();
 
+
+        //may need to change where it get the port number
         StringTokenizer tokens = new StringTokenizer(fromClient);
         String frstln = tokens.nextToken();
         int port = Integer.parseInt(frstln);
@@ -43,6 +45,7 @@ public class ClientHandler extends Thread{
             for (String file : files){
                 dataOutToClient.writeBytes(file);
             }
+
             dataOutToClient.writeBytes("\n");
 
             dataOutToClient.close();
@@ -79,9 +82,16 @@ public class ClientHandler extends Thread{
             Socket dataSocket = new Socket(socket.getInetAddress(), port);
             DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
 
+            //should turn into a file need to add codes and stuff
             String fileName = clientCommand.substring(6);
+            File file = new File(fileName);
+            DataInputStream dataIn = new DataInputStream(dataSocket.getInputStream());
 
-            //TODO get bytes, and turn into file somehow
+            OutputStream byteWriter = new FileOutputStream(file);
+            byte[] bytes = dataIn.readAllBytes();
+            byteWriter.write(bytes);
+            byteWriter.close();
+
 
             dataOutToClient.close();
             dataSocket.close();

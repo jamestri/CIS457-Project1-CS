@@ -44,7 +44,7 @@ class FTPClient {
                 if (sentence.equals("list:")) {
 
                     port = port + 2;
-                    outToServer.writeBytes(sentence + '\n');
+                    outToServer.writeBytes(sentence + " " + port + '\n');
 
                     ServerSocket welcomeData = new ServerSocket(port);
                     Socket dataSocket = welcomeData.accept();
@@ -52,18 +52,39 @@ class FTPClient {
                     DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
                     while (notEnd) {
                         modifiedSentence = inData.readUTF();
-                        //do something
+                        System.out.println(modifiedSentence);
+                        if (modifiedSentence.equals(-1)){
+                            notEnd = false;
+                        }
                     }
-
 
                     welcomeData.close();
                     dataSocket.close();
                     System.out.println("\nWhat would you like to do next: \n retr: file.txt ||stor: file.txt  || close");
 
-                } else if (sentence.startsWith("retr: ")) {
-                    //do something
+                } if (sentence.startsWith("retr: ")) {
+                    String fileName = sentence.substring(6);
+
+                    port += 2;
+                    outToServer.writeBytes(sentence + " " + port + '\n');
+
+
+                } if (sentence.startsWith("stor: ")){
+                    String fileName = sentence.substring(6);
+
+                    port += 2;
+                    outToServer.writeBytes(sentence + " " + port + '\n');
+
+                } if (sentence.startsWith("close")){
+
+                    port += 2;
+                    outToServer.writeBytes(sentence + " " + port + '\n');
+                    ControlSocket.close();
+                    return;
                 }
             }
         }
+
+        inFromUser.close();
     }
 }
