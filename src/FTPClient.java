@@ -69,10 +69,11 @@ class FTPClient {
                     Socket dataSocket = welcomeData.accept();
                     BufferedReader inData = new BufferedReader(new InputStreamReader(dataSocket.getInputStream()));
 
-                    if (inData.readLine().equals("550")){
+                    String read = inData.readLine();
+                    if (read.equals("550")){
                         System.out.println("550 Cannot find file");
                     }
-                    if (inData.readLine().equals("200 OK")){
+                    if (read.equals("200 OK")){
                         System.out.println("200 OK");
                         File file = new File(fileName);
                         OutputStream out = new FileOutputStream(file);
@@ -99,8 +100,8 @@ class FTPClient {
                     BufferedReader inData = new BufferedReader(new InputStreamReader(dataSocket.getInputStream()));
 
                     //if file does not exist on server
-                    if (inData.readLine().equals("200 OK")) {
-                        System.out.println("200 OK");
+                    String read = inData.readLine();
+                    if (read.equals("200 OK")) {
                         //PATH should be directory of client
                         File folder = new File("C:\\Users\\bunny\\Desktop\\folder");
                         String[] files = folder.list();
@@ -109,6 +110,9 @@ class FTPClient {
                         for (String file : files) {
                             if (file.equals(fileName)) {
                                 found = true;
+                                System.out.println("200 OK");
+                                dataToServer.writeBytes("200 OK");
+                                dataToServer.writeBytes("\n");
                                 FileInputStream fis = new FileInputStream("C:\\Users\\bunny\\Desktop\\folder\\" + fileName);
                                 //add headers and stuff and codes
                                 sendBytes(fis, dataToServer);
@@ -117,10 +121,12 @@ class FTPClient {
                         }
                         if (!found) {
                             System.out.println("Could not find file in client directory");
+                            outToServer.writeBytes("550");
+                            outToServer.writeBytes("\n");
                         }
                     }
                     //if file exists on server
-                    if (inData.readLine().equals("550")){
+                    if (read.equals("550")){
                         System.out.println("550 File already exists on server");
                     }
                     socket.close();

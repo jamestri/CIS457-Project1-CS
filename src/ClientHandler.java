@@ -98,7 +98,7 @@ public class ClientHandler extends Thread{
             File file = new File(fileName);
             BufferedReader dataIn = new BufferedReader(new InputStreamReader(dataSocket.getInputStream()));
 
-            File folder = new File("C:\\Users\\bunny\\Desktop\\folder");
+            File folder = new File("C:\\Users\\bunny\\IdeaProjects\\CIS457Proj1");
             String[] files = folder.list();
             boolean found = false;
             //check if file is found on server
@@ -110,13 +110,18 @@ public class ClientHandler extends Thread{
                 }
             }
             //if file is not found on server send ok
-            if (!found){
+            if (!found) {
                 dataOutToClient.writeBytes("200 OK");
                 dataOutToClient.writeBytes("\n");
-                OutputStream byteWriter = new FileOutputStream(file);
-                byteWriter.write(dataIn.read());
-                byteWriter.close();
             }
+            String check = dataIn.readLine();
+
+                if (check.equals("200 OK") && !found) {
+                    OutputStream byteWriter = new FileOutputStream(file);
+                    byteWriter.write(dataIn.read());
+                    byteWriter.close();
+                }
+
 
             dataOutToClient.close();
             dataSocket.close();
