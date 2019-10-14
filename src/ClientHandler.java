@@ -7,6 +7,7 @@ public class ClientHandler extends Thread{
     Socket socket;
 
     public ClientHandler(Socket connection) throws Exception{
+        super();
         this.socket = connection;
     }
 
@@ -14,9 +15,11 @@ public class ClientHandler extends Thread{
     @Override
     public void run() {
         try{
-            processRequest();
+            while(socket.isConnected()){
+                processRequest();
+            }
         } catch (Exception e){
-            System.out.println(e);
+            System.out.println("Client Disconnected");
         }
 
     }
@@ -25,7 +28,7 @@ public class ClientHandler extends Thread{
         DataOutputStream outToClient = new DataOutputStream(socket.getOutputStream());
         BufferedReader inFromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-        System.out.println("Client connected");
+        System.out.println("Client connected " + socket.getInetAddress());
         String fromClient = inFromClient.readLine();
 
         //may need to change where it get the port number
@@ -33,6 +36,7 @@ public class ClientHandler extends Thread{
         String frstln = tokens.nextToken();
         int port = Integer.parseInt(frstln);
         String clientCommand = tokens.nextToken();
+        System.out.println(clientCommand + socket.getInetAddress());
         if (clientCommand.equals("list:")) {
 
             Socket dataSocket = new Socket(socket.getInetAddress(), port);
@@ -44,6 +48,7 @@ public class ClientHandler extends Thread{
 
             for (String file : files){
                 dataOutToClient.writeBytes(file);
+                dataOutToClient.writeBytes(" ");
             }
 
             dataOutToClient.writeBytes("\n");
@@ -58,19 +63,20 @@ public class ClientHandler extends Thread{
             Socket dataSocket = new Socket(socket.getInetAddress(), port);
             DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
 
-            String fileName = clientCommand.substring(6);//starting after the space
-
-            File folder = new File("C:\\Users\\bunny\\IdeaProjects\\CIS457Proj1");
+            String fileName = tokens.nextToken();//starting after the space
+            File folder = new File("C:\\Users\\bunny\\Desktop\\folder");
             String[] files = folder.list();
 
             //finding our file in directory and sending it
             for (String file: files){
                 if (file.equals(fileName)){
-                    FileInputStream fis = new FileInputStream(fileName);
-                    //add headers and stuff and codes
+                    dataOutToClient.writeBytes("200 OK");
+                    FileInputStream fis = new FileInputStream("C:\\Users\\bunny\\Desktop\\folder\\" + fileName);
                     sendBytes(fis, dataOutToClient);
+                    fis.close();
                 } else {
                     dataOutToClient.writeBytes("550");
+                    dataOutToClient.writeBytes("\n");
                 }
             }
             dataOutToClient.close();
@@ -83,15 +89,13 @@ public class ClientHandler extends Thread{
             DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
 
             //should turn into a file need to add codes and stuff
-            String fileName = clientCommand.substring(6);
+            String fileName = tokens.nextToken();
             File file = new File(fileName);
-            DataInputStream dataIn = new DataInputStream(dataSocket.getInputStream());
-
+            BufferedReader dataIn = new BufferedReader(new InputStreamReader(dataSocket.getInputStream()));
+            
             OutputStream byteWriter = new FileOutputStream(file);
-            byte[] bytes = dataIn.readAllBytes();
-            byteWriter.write(bytes);
+            byteWriter.write(dataIn.read());
             byteWriter.close();
-
 
             dataOutToClient.close();
             dataSocket.close();

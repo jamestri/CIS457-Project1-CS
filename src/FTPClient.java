@@ -10,11 +10,6 @@ class FTPClient {
     public static void main(String argv[]) throws Exception {
         String sentence;
         String modifiedSentence;
-        boolean isOpen = true;
-        int number = 1;
-        boolean notEnd = true;
-        String statusCode;
-        boolean clientgo = true;
         int port1;
 
         System.out.println("Enter connect to connect to server");
@@ -33,7 +28,7 @@ class FTPClient {
 
             Socket ControlSocket = new Socket(serverName, port1);
 
-            while (isOpen && clientgo) {
+            while (true) {
 
                 DataOutputStream outToServer = new DataOutputStream(ControlSocket.getOutputStream());
 
@@ -52,66 +47,69 @@ class FTPClient {
                     ServerSocket welcomeData = new ServerSocket(port);
                     Socket dataSocket = welcomeData.accept();
                     BufferedReader inData = new BufferedReader(new InputStreamReader(dataSocket.getInputStream()));
-                    //System.out.println(inData.available());
                     while (inData.read() != -1) {
                         modifiedSentence = inData.readLine();
                         System.out.println(modifiedSentence);
                     }
 
-
+                    inData.close();
                     welcomeData.close();
                     dataSocket.close();
                     System.out.println("\nWhat would you like to do next: \n retr: file.txt ||stor: file.txt  || close");
 
                 } if (sentence.startsWith("retr: ")) {
-                    String fileName = sentence.substring(6);
+                    StringTokenizer tok = new StringTokenizer(sentence);
+                    tok.nextToken();
+                    String fileName = tok.nextToken();
 
                     port += 2;
 
+                    outToServer.writeBytes(port + " " + sentence + '\n');
                     ServerSocket welcomeData = new ServerSocket(port);
                     Socket dataSocket = welcomeData.accept();
-                    DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
+                    BufferedReader inData = new BufferedReader(new InputStreamReader(dataSocket.getInputStream()));
 
-                    outToServer.writeBytes(port + "\n" + sentence + '\n');
-
-                    if (inData.readUTF().equals("550")){
+                    if (inData.readLine().equals("550")){
                         System.out.println("Cannot find file");
-                    } else {
+                    }
+                    if (inData.readLine().equals("200 OK")){
                         File file = new File(fileName);
                         OutputStream out = new FileOutputStream(file);
-                        byte[] bytes = inData.readAllBytes();
-                        out.write(bytes);
+                        out.write(inData.read());
                         out.close();
                     }
+                    inData.close();
                     welcomeData.close();
                     dataSocket.close();
 
                     System.out.println("\nWhat would you like to do next: \n retr: file.txt ||stor: file.txt  || close");
 
                 } if (sentence.startsWith("stor: ")){
-                    String fileName = sentence.substring(6);
-
+                    StringTokenizer tok = new StringTokenizer(sentence);
+                    tok.nextToken();
+                    String fileName = tok.nextToken();
                     port += 2;
 
+                    outToServer.writeBytes(port + " " + sentence + '\n');
                     ServerSocket socket = new ServerSocket(port);
                     Socket dataSocket = socket.accept();
 
                     DataOutputStream dataToServer = new DataOutputStream(dataSocket.getOutputStream());
 
-                    outToServer.writeBytes(port + "\n" + sentence + '\n');
-
                     //PATH should be directory of client
-                    File folder = new File("C:\\Users\\bunny\\IdeaProjects\\CIS457Proj1");
+                    File folder = new File("C:\\Users\\bunny\\Desktop\\folder");
                     String[] files = folder.list();
                     //needs some refining
                     //finding our file in directory and sending it
                     for (String file: files){
                         if (file.equals(fileName)){
-                            FileInputStream fis = new FileInputStream(fileName);
+                            FileInputStream fis = new FileInputStream("C:\\Users\\bunny\\Desktop\\folder\\"+fileName);
                             //add headers and stuff and codes
                             sendBytes(fis, dataToServer);
+                            fis.close();
                         } else {
                             dataToServer.writeBytes("550");
+                            dataToServer.writeBytes("\n");
                         }
                     }
                     socket.close();
@@ -121,7 +119,7 @@ class FTPClient {
                 } if (sentence.startsWith("close")){
 
                     port += 2;
-                    outToServer.writeBytes(port + "\n" + sentence + '\n');
+                    outToServer.writeBytes(port + " " + sentence + '\n');
                     ControlSocket.close();
                     System.out.println("Connection closed");
                     return;
