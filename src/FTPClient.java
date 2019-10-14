@@ -12,7 +12,7 @@ class FTPClient {
         String modifiedSentence;
         int port1;
 
-        System.out.println("Enter connect to connect to server");
+        System.out.println("Enter connect, IP address, and port number to connect");
 
         BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
         sentence = inFromUser.readLine();
@@ -57,7 +57,7 @@ class FTPClient {
                     dataSocket.close();
                     System.out.println("\nWhat would you like to do next: \n retr: file.txt ||stor: file.txt  || close");
 
-                } if (sentence.startsWith("retr: ")) {
+                } else if (sentence.startsWith("retr: ")) {
                     StringTokenizer tok = new StringTokenizer(sentence);
                     tok.nextToken();
                     String fileName = tok.nextToken();
@@ -86,7 +86,7 @@ class FTPClient {
 
                     System.out.println("\nWhat would you like to do next: \n retr: file.txt ||stor: file.txt  || close");
 
-                } if (sentence.startsWith("stor: ")){
+                } else if (sentence.startsWith("stor: ")){
                     StringTokenizer tok = new StringTokenizer(sentence);
                     tok.nextToken();
                     String fileName = tok.nextToken();
@@ -133,15 +133,19 @@ class FTPClient {
                     dataSocket.close();
                     System.out.println("\nWhat would you like to do next: \n retr: file.txt ||stor: file.txt  || close");
 
-                } if (sentence.startsWith("close")){
+                } else if (sentence.startsWith("quit:")){
 
                     port += 2;
                     outToServer.writeBytes(port + " " + sentence + '\n');
                     ControlSocket.close();
                     System.out.println("Connection closed");
                     return;
+                } else {
+                    System.out.println("\nWhat would you like to do next: \n retr: file.txt ||stor: file.txt  || close");
                 }
             }
+        } else {
+            System.out.println("Enter the correct arguments");
         }
 
 

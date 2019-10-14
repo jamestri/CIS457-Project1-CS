@@ -9,6 +9,7 @@ public class ClientHandler extends Thread{
     public ClientHandler(Socket connection) throws Exception{
         super();
         this.socket = connection;
+        System.out.println("Client connected " + socket.getInetAddress());
     }
 
 
@@ -28,7 +29,6 @@ public class ClientHandler extends Thread{
         DataOutputStream outToClient = new DataOutputStream(socket.getOutputStream());
         BufferedReader inFromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-        System.out.println("Client connected " + socket.getInetAddress());
         String fromClient = inFromClient.readLine();
 
         //may need to change where it get the port number
@@ -129,7 +129,7 @@ public class ClientHandler extends Thread{
         }
 
 
-        if (clientCommand.equals("close")){
+        if (clientCommand.equals("quit:")){
             socket.close();
             System.out.println("Client has disconnected");
             return;
