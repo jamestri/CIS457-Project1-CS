@@ -70,9 +70,10 @@ class FTPClient {
                     BufferedReader inData = new BufferedReader(new InputStreamReader(dataSocket.getInputStream()));
 
                     if (inData.readLine().equals("550")){
-                        System.out.println("Cannot find file");
+                        System.out.println("550 Cannot find file");
                     }
                     if (inData.readLine().equals("200 OK")){
+                        System.out.println("200 OK");
                         File file = new File(fileName);
                         OutputStream out = new FileOutputStream(file);
                         out.write(inData.read());
@@ -95,22 +96,32 @@ class FTPClient {
                     Socket dataSocket = socket.accept();
 
                     DataOutputStream dataToServer = new DataOutputStream(dataSocket.getOutputStream());
+                    BufferedReader inData = new BufferedReader(new InputStreamReader(dataSocket.getInputStream()));
 
-                    //PATH should be directory of client
-                    File folder = new File("C:\\Users\\bunny\\Desktop\\folder");
-                    String[] files = folder.list();
-                    //needs some refining
-                    //finding our file in directory and sending it
-                    for (String file: files){
-                        if (file.equals(fileName)){
-                            FileInputStream fis = new FileInputStream("C:\\Users\\bunny\\Desktop\\folder\\"+fileName);
-                            //add headers and stuff and codes
-                            sendBytes(fis, dataToServer);
-                            fis.close();
-                        } else {
-                            dataToServer.writeBytes("550");
-                            dataToServer.writeBytes("\n");
+                    //if file does not exist on server
+                    if (inData.readLine().equals("200 OK")) {
+                        System.out.println("200 OK");
+                        //PATH should be directory of client
+                        File folder = new File("C:\\Users\\bunny\\Desktop\\folder");
+                        String[] files = folder.list();
+                        //finding our file in directory and sending it
+                        boolean found = false;
+                        for (String file : files) {
+                            if (file.equals(fileName)) {
+                                found = true;
+                                FileInputStream fis = new FileInputStream("C:\\Users\\bunny\\Desktop\\folder\\" + fileName);
+                                //add headers and stuff and codes
+                                sendBytes(fis, dataToServer);
+                                fis.close();
+                            }
                         }
+                        if (!found) {
+                            System.out.println("Could not find file in client directory");
+                        }
+                    }
+                    //if file exists on server
+                    if (inData.readLine().equals("550")){
+                        System.out.println("550 File already exists on server");
                     }
                     socket.close();
                     dataSocket.close();
@@ -124,14 +135,12 @@ class FTPClient {
                     System.out.println("Connection closed");
                     return;
                 }
-                //inFromUser.close();
             }
         }
 
 
     }
 
-    //might need bigger buffer
     private static void sendBytes(FileInputStream fis, OutputStream os) throws Exception{
         byte[] buffer = new byte[1024];
         int bytes = 0;

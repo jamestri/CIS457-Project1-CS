@@ -68,16 +68,21 @@ public class ClientHandler extends Thread{
             String[] files = folder.list();
 
             //finding our file in directory and sending it
+            boolean found = false;
             for (String file: files){
                 if (file.equals(fileName)){
+                    found = true;
                     dataOutToClient.writeBytes("200 OK");
+                    dataOutToClient.writeBytes("\n");
                     FileInputStream fis = new FileInputStream("C:\\Users\\bunny\\Desktop\\folder\\" + fileName);
                     sendBytes(fis, dataOutToClient);
                     fis.close();
-                } else {
-                    dataOutToClient.writeBytes("550");
-                    dataOutToClient.writeBytes("\n");
                 }
+            }
+            //if file is not found send 550
+            if (!found){
+                dataOutToClient.writeBytes("550");
+                dataOutToClient.writeBytes("\n");
             }
             dataOutToClient.close();
             dataSocket.close();
@@ -92,10 +97,26 @@ public class ClientHandler extends Thread{
             String fileName = tokens.nextToken();
             File file = new File(fileName);
             BufferedReader dataIn = new BufferedReader(new InputStreamReader(dataSocket.getInputStream()));
-            
-            OutputStream byteWriter = new FileOutputStream(file);
-            byteWriter.write(dataIn.read());
-            byteWriter.close();
+
+            File folder = new File("C:\\Users\\bunny\\Desktop\\folder");
+            String[] files = folder.list();
+            boolean found = false;
+            //check if file is found on server
+            for (String find: files){
+                if (find.equals(fileName)){
+                    found = true;
+                    dataOutToClient.writeBytes("550");
+                    dataOutToClient.writeBytes("\n");
+                }
+            }
+            //if file is not found on server send ok
+            if (!found){
+                dataOutToClient.writeBytes("200 OK");
+                dataOutToClient.writeBytes("\n");
+                OutputStream byteWriter = new FileOutputStream(file);
+                byteWriter.write(dataIn.read());
+                byteWriter.close();
+            }
 
             dataOutToClient.close();
             dataSocket.close();
